@@ -73,7 +73,7 @@ jobs:
     - name: Install dependencies
       run: |
         cd frontend/
-        npm install --legacy-peer-deps
+        npm install react-meta-tags@latest
         npm ci
 
     - name: Test frontend

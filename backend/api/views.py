@@ -234,7 +234,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         recipe = serializer.save(author=self.request.user)
-        original_url = f'{settings.BASE_URL}/recipes/{recipe.id}/'
+        base_url = f"{self.request.scheme}://{self.request.get_host()}"
+        full_path = self.request.path
+        original_url = f'{base_url}{full_path}'
         short_link = ShortLink(original_url=original_url, recipe=recipe)
         short_link.save()
 

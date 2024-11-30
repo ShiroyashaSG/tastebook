@@ -5,11 +5,20 @@ from recipe.models import Ingredient
 
 
 class Command(BaseCommand):
-    help = 'Import ingredients from ingredients.json'
+    help = 'Import ingredients from a specified JSON file'
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            'file_path',
+            nargs='?',
+            default='/app/data/ingredients.json',
+            help='Path to the JSON file containing ingredients',
+        )
 
     def handle(self, *args, **kwargs):
+        file_path = kwargs['file_path']
         with open(
-            'D:/Dev/foodgram/data/ingredients.json', 'r', encoding='utf-8'
+            file_path, 'r', encoding='utf-8'
         ) as file:
             data = json.load(file)
             for ingredient_data in data:

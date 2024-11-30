@@ -17,7 +17,7 @@ services:
     volumes:
       - static:/backend_static
       - media:/app/media
-      - data/:/app/data
+      - ./data/:/app/data
   frontend:
     build: ./frontend/
     env_file: .env
@@ -30,6 +30,6 @@ services:
     volumes:
       - static:/staticfiles
       - media:/app/media
-      - docs/:/usr/share/nginx/html/api/docs
+      - ./docs/:/usr/share/nginx/html/api/docs
     ports:
       - 8080:80

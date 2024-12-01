@@ -4,6 +4,8 @@ from api.views import redirect_short_link
 
 from api.views import redirect_short_link
 
+from api.views import redirect_short_link
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),

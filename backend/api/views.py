@@ -240,7 +240,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         recipe = serializer.save(author=self.request.user)
-        base_url = f"{self.request.scheme}://{self.request.get_host()}"
+        base_url = f"https://{self.request.get_host()}"
         full_path = self.request.path
         original_url = f'{base_url}{full_path}'
         short_link = ShortLink(original_url=original_url, recipe=recipe)
@@ -282,7 +282,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Получение короткой ссылки."""
         recipe = get_object_or_404(Recipe, id=pk)
         short_link = get_object_or_404(ShortLink, recipe=recipe)
-        base_url = f"{request.scheme}://{request.get_host()}"
+        base_url = f"https://{request.get_host()}"
         full_url = urljoin(base_url, f"/s/{short_link.short_url}")
         return Response({'short-link': full_url})
 

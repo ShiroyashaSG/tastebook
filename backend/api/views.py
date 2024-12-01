@@ -29,9 +29,9 @@ User = get_user_model()
 def redirect_short_link(request, short_code):
     """Обработка короткой ссылки и перенаправление на рецепт."""
     short_link = get_object_or_404(ShortLink, short_url=short_code)
-    base_url = f"{request.scheme}://{request.get_host()}"
-    original_link = f"{base_url}{short_link.original_url}"
-    return redirect(original_link)
+    # base_url = f"{request.scheme}://{request.get_host()}"
+    # original_link = f"{base_url}{short_link.original_url}"
+    return redirect(short_link.original_url)
 
 
 class CustomUserViewSet(UserViewSet):

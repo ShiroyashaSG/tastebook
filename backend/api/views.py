@@ -10,7 +10,7 @@ from djoser.views import UserViewSet
 from recipe.models import (Favorite, Follow, Ingredient, IngredientRecipe,
                            Recipe, ShoppingCart, ShortLink, Tag)
 from rest_framework import mixins, permissions, status, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 
 from .filters import RecipeFilter
@@ -22,6 +22,13 @@ from .serializers import (IngredientSerializer, RecipeCreateUpdateSerializer,
                           UserFollowSerializer)
 
 User = get_user_model()
+
+
+@api_view(['GET'])
+def redirect_short_link(request, short_code):
+    """Обработка короткой ссылки и перенаправление на рецепт."""
+    short_link = get_object_or_404(ShortLink, short_url=short_code)
+    return redirect(short_link.original_url)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -278,16 +285,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         base_url = f"{request.scheme}://{request.get_host()}"
         full_url = urljoin(base_url, f"/s/{short_link.short_url}")
         return Response({'short-link': full_url})
-
-    @action(
-        methods=['get'],
-        detail=True,
-        url_path=r's/(?P<short_code>\w+)'
-    )
-    def redirect_short_link(self, request, short_code):
-        """Обработка короткой ссылки и перенаправление на рецепт."""
-        short_link = get_object_or_404(ShortLink, short_url=short_code)
-        return redirect(short_link.original_url)
 
     def get_shopping_cart_ingredients(self):
         """Генерация и скачивание списка покупок в формате CSV."""

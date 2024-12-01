@@ -10,7 +10,7 @@ from djoser.views import UserViewSet
 from recipe.models import (Favorite, Follow, Ingredient, IngredientRecipe,
                            Recipe, ShoppingCart, ShortLink, Tag)
 from rest_framework import mixins, permissions, status, viewsets
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 
 from .filters import RecipeFilter
@@ -25,10 +25,13 @@ User = get_user_model()
 
 
 @api_view(['GET'])
+@permission_classes([permissions.AllowAny])
 def redirect_short_link(request, short_code):
     """Обработка короткой ссылки и перенаправление на рецепт."""
     short_link = get_object_or_404(ShortLink, short_url=short_code)
-    return redirect(short_link.original_url)
+    base_url = f"{request.scheme}://{request.get_host()}"
+    original_link = f"{base_url}{short_link.original_url}"
+    return redirect(original_link)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -240,9 +243,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         recipe = serializer.save(author=self.request.user)
-        base_url = f"https://{self.request.get_host()}"
         full_path = self.request.path
-        original_url = f'{base_url}{full_path}'
+        original_url = f'{full_path}{recipe.id}/'
         short_link = ShortLink(original_url=original_url, recipe=recipe)
         short_link.save()
 
@@ -282,7 +284,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Получение короткой ссылки."""
         recipe = get_object_or_404(Recipe, id=pk)
         short_link = get_object_or_404(ShortLink, recipe=recipe)
-        base_url = f"https://{request.get_host()}"
+        base_url = f"{request.scheme}://{request.get_host()}"
         full_url = urljoin(base_url, f"/s/{short_link.short_url}")
         return Response({'short-link': full_url})
 

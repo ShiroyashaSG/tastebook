@@ -81,4 +81,4 @@ class ShortLinkAdmin(admin.ModelAdmin):
         return obj.recipe.name if obj.recipe else None
 
     get_recipe_id.short_description = 'Recipe PK'
-    get_recipe_id.short_description = 'Название рецепта'
+    get_recipe_name.short_description = 'Название рецепта'

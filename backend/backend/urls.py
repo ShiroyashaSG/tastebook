@@ -1,3 +1,4 @@
+from api.views import redirect_short_link
 from django.contrib import admin
 from django.urls import include, path
 from api.views import redirect_short_link

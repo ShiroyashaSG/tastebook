@@ -320,7 +320,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         items = self.get_shopping_cart_ingredients()
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = (
-            'attachment; filename="shopping_cart.csv"'
+            'attachment; filename="shopping_cart.csv"; charset=windows-1251'
         )
         writer = csv.writer(response, delimiter=';')
         writer.writerow(['Название', 'Единица измерения', 'Количество'])

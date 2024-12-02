@@ -15,7 +15,7 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(', ')
 
 AUTH_USER_MODEL = 'users.User'
 
-AUTHENTICATION_BACKENDS = ["djoser.auth_backends.LoginFieldBackend",]
+AUTHENTICATION_BACKENDS = ["djoser.auth_backends.LoginFieldBackend", ]
 
 DJANGO_APPS = [
     'django.contrib.admin',

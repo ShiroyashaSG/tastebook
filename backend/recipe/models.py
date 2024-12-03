@@ -6,8 +6,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
 
-from .constants import (MAX_LENGTH_INGREDIENT_NAME,
-                        MAX_LENGTH_INGREDIENT_UNIT,
+from .constants import (MAX_LENGTH_INGREDIENT_NAME, MAX_LENGTH_INGREDIENT_UNIT,
                         MAX_LENGTH_RECIPE_NAME, MAX_LENGTH_SHORT_URL,
                         MAX_TAG_NAME_SLUG_LENGTH, MIN_VALUE)
 

@@ -30,31 +30,37 @@ class Command(BaseCommand):
                         ingredient, created = Ingredient.objects.get_or_create(
                             name=ingredient_data['name'],
                             defaults={
-                                'measurement_unit': ingredient_data['measurement_unit']
+                                'measurement_unit': ingredient_data[
+                                    'measurement_unit'
+                                ]
                             }
                         )
                         if created:
                             self.stdout.write(
                                 self.style.SUCCESS(
-                                    f"Ингредиент '{ingredient.name}' добавлен"
+                                    'Ингредиент '
+                                    f'"{ingredient.name}" добавлен'
                                 )
                             )
                             added_count += 1
                         else:
                             self.stdout.write(
                                 self.style.WARNING(
-                                    f"Ингредиент '{ingredient.name}' уже существует"
+                                    'Ингредиент '
+                                    f'"{ingredient.name}" уже существует'
                                 )
                             )
                             existing_count += 1
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f"Импорт завершен: добавлено {added_count} новых ингредиентов, "
-                        f"уже существующих — {existing_count}."
+                        'Импорт завершен: добавлено '
+                        f'{added_count} новых ингредиентов, '
+                        f'уже существующих — {existing_count}.'
                     )
                 )
             except json.JSONDecodeError:
-                self.stdout.write(self.style.ERROR("Ошибка при чтении JSON файла"))
+                self.stdout.write(self.style.ERROR(
+                    "Ошибка при чтении JSON файла"))
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"Произошла ошибка: {e}"))
         else:

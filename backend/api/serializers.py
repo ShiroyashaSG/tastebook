@@ -81,18 +81,6 @@ class CustomUserSerializer(CustomUserMixin, serializers.ModelSerializer):
         return obj.followers.filter(user=user).exists()
 
 
-class RecipeListFollowSerializer2(serializers.Serializer):
-    recipes_limit = serializers.IntegerField(
-        required=False,
-        min_value=1,
-        max_value=100,
-        error_messages={
-            'min_value': 'Минимальное количество рецептов: 1.',
-            'max_value': 'Максимальное количество рецептов: 100.',
-        }
-    )
-
-
 class RecipeListFollowSerializer(serializers.Serializer):
     recipes_limit = serializers.IntegerField(
         required=False,

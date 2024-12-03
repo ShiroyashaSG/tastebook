@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
+
 from recipe.models import (Favorite, Follow, Ingredient,
                            Recipe, ShoppingCart, ShortLink, Tag)
 from rest_framework import mixins, permissions, status, viewsets

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from backend.constants import MAX_LENGTH_NAME
+from .constants import MAX_LENGTH_NAME
 
 
 class User(AbstractUser):
@@ -35,6 +35,8 @@ class User(AbstractUser):
         upload_to='media/users/',
         blank=True
     )
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
         verbose_name = 'пользователь'

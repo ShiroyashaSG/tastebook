@@ -79,7 +79,6 @@ DATABASES = {
     }
 }
 
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -121,7 +120,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
+    'PAGE_SIZE': 10,
+    'DEFAULT_PAGINATION_CLASS': None
 }
+
+SILENCED_SYSTEM_CHECKS = ['rest_framework.W001']
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
@@ -133,5 +136,5 @@ DJOSER = {
     'PERMISSIONS': {
         'user_list': ['api.permissions.IsAnonymous']
     },
-    'HIDE_USERS': False
+    'HIDE_USERS': False,
 }

@@ -1,10 +1,10 @@
 # Фудграм
 
-![Логотип проекта](images/logo-footer.png)
+![Логотип проекта](readme_images/logo-footer.png)
 
 **Фудграм** — это веб-приложение для публикации и обмена рецептами. Пользователи могут публиковать свои рецепты, добавлять чужие рецепты в избранное и подписываться на публикации других авторов. Зарегистрированным пользователям также будет доступен сервис «Список покупок». Он позволит создавать список продуктов, которые нужно купить для приготовления выбранных блюд.
 
-![Главная страница проекта](images/example.png)
+![Главная страница проекта](readme_images/image_1711954469.png)
 
 ## Возможности проекта
 
@@ -61,66 +61,66 @@
 
 ### Чтобы развернуть проект локально, выполните следующие шаги:
 
-0. Клонируйте репозиторий:
+1. Клонируйте репозиторий:
    ```bash
    git clone https://github.com/ShiroyashaSG/foodgram.git
    ```
-1. Перейдите в директорию проекта:
+2. Перейдите в директорию проекта:
    ```bash
    cd foodgram
    ```
-2. Cоздайте и активируйте виртуальное окружение:
+3. Cоздайте и активируйте виртуальное окружение:
    ```bash
    py -3.9 -m venv venv
    source venv\Scripts\activate  # Для Linux: venv/bin/activate
    ```
-3. Установите зависимости из файла requirements.txt:
+4. Установите зависимости из файла requirements.txt:
    ```bash
    python -m pip install --upgrade pip
    pip install -r requirements.txt
    ```
-4. Создайте миграции:
-  ```bash
+5. Создайте миграции:
+   ```bash
    python manage.py makemigrations
    ```
-5. Примените миграции:
+6. Примените миграции:
    ```bash
    python manage.py migrate
    ```
-6. Загрузите данные из csv - файлов в базу данных:
+7. Загрузите данные из csv - файлов в базу данных:
    ```bash
    python manage.py import_data
    ```
-7. Запустите сервер:
+8. Запустите сервер:
    ```bash
    python manage.py runserver
    ```
 
 ### Чтобы развернуть проект на сервере:
-0. Установить docker на сервер (Linux):
+1. Установить docker на сервер (Linux):
     ```bash
     sudo apt update
     sudo apt install curl
     curl -fSL https://get.docker.com -o get-docker.sh 
     sudo sh ./get-docker.sh
     ```
-1. Установить докер docker-compose:
+2. Установить докер docker-compose:
     ```bash
     sudo apt install docker-compose-plugin
     sudo systemctl status docker
     ```
-2. Установить nginx:
+3. Установить nginx:
     ```bash
     sudo apt install nginx -y
     sudo systemctl start nginx
     ```
-3. Настроить nginx:
+4. Настроить nginx:
     ```bash
     sudo nano /etc/nginx/sites-enabled/default
     sudo nginx -t
     sudo systemctl reload nginx
     ```
-4. Создать директорию проекта и добавить .env:
+5. Создать директорию проекта и добавить .env:
     ```bash
     mkdir foodgram && cd foodgram/
     nano .env
@@ -137,11 +137,11 @@
     DB_HOST=<db_host>
     DB_PORT=5432
     ```
-5. Скопировать в директорию проекта папки data, docs и docker-compose.yml файл:
+6. Скопировать в директорию проекта папки data, docs и docker-compose.yml файл:
     ```bash
     scp -r data/* docs/* docker-compose.yml <server user>@<server IP>:/home/<server user>/foodgram/
     ```
-6. Выполнить сборку статики:
+7. Выполнить сборку статики:
     ```bash
     sudo docker compose -f docker-compose.yml pull
     sudo docker compose -f docker-compose.yml down
@@ -150,11 +150,11 @@
     sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic
     sudo docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /backend_static/static/
     ```
-7. Создать суперпользователя:
+8. Создать суперпользователя:
     ```bash
     sudo docker compose -f docker-compose.yml exec backend python manage.py createsuperuser
     ```
-8. Импортировать ингредиенты:
+9. Импортировать ингредиенты:
     ```bash
     sudo docker compose -f docker-compose.yml exec backend python manage.py import_data
     ```

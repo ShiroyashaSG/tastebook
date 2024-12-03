@@ -7,21 +7,21 @@ from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 
-from recipe.models import (Favorite, Follow, Ingredient,
-                           Recipe, ShoppingCart, ShortLink, Tag)
+from recipe.models import (Favorite, Follow, Ingredient, Recipe, ShoppingCart,
+                           ShortLink, Tag)
+
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 
-from .services import get_shopping_cart_ingredients
-from .filters import RecipeFilter, IngredientFilter
+from .filters import IngredientFilter, RecipeFilter
 from .pagination import CustomPagination
 from .permissions import IsAnonymous, IsAuthor
 from .serializers import (IngredientSerializer, RecipeCreateUpdateSerializer,
-                          RecipeSerializer, RecipeShortSerializer,
-                          TagSerializer, UserAvatarSerializer,
-                          UserFollowSerializer,
-                          RecipeListFollowSerializer)
+                          RecipeListFollowSerializer, RecipeSerializer,
+                          RecipeShortSerializer, TagSerializer,
+                          UserAvatarSerializer, UserFollowSerializer)
+from .services import get_shopping_cart_ingredients
 
 User = get_user_model()
 

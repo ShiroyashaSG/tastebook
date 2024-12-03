@@ -7,8 +7,7 @@ from django.db import models
 from django.db.models import CheckConstraint, F, Q
 
 from .constants import (MAX_LENGTH_INGREDIENT_NAME, MAX_LENGTH_INGREDIENT_UNIT,
-
-User = get_user_model()
+                        User, =, get_user_model)
 
 
 class Tag(models.Model):

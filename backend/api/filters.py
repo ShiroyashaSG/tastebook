@@ -1,5 +1,5 @@
 from django_filters import rest_framework as filters
-from recipe.models import Recipe, Tag
+from recipe.models import Recipe, Tag, Ingredient
 
 
 class RecipeFilter(filters.FilterSet):
@@ -36,3 +36,16 @@ class RecipeFilter(filters.FilterSet):
         if value:
             return queryset.filter(shoppingcart_set__isnull=False)
         return queryset
+
+
+class IngredientFilter(filters.FilterSet):
+    """Фильтр для ингредиентов."""
+    name = filters.CharFilter(
+        field_name='name',
+        lookup_expr='icontains',
+        label='Название'
+    )
+
+    class Meta:
+        model = Ingredient
+        fields = ['name']

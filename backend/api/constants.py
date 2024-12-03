@@ -1,0 +1,3 @@
+MAX_LENGTH_NAME: int = 150
+MAX_LENGTH_EMAIL: int = 254
+REGEX_USERNAME: str = r'^[\w.@+-]+\Z'

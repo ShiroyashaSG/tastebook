@@ -2,14 +2,14 @@ import random
 import string
 
 from django.contrib.auth import get_user_model
-from django.core.validators import RegexValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
 
-from backend.constants import (MAX_LENGTH_INGREDIENT_NAME,
-                               MAX_LENGTH_INGREDIENT_UNIT,
-                               MAX_LENGTH_RECIPE_NAME, MAX_LENGTH_SHORT_URL,
-                               MAX_TAG_NAME_SLUG_LENGTH, REGEX_SLUG)
+from .constants import (MAX_LENGTH_INGREDIENT_NAME,
+                        MAX_LENGTH_INGREDIENT_UNIT,
+                        MAX_LENGTH_RECIPE_NAME, MAX_LENGTH_SHORT_URL,
+                        MAX_TAG_NAME_SLUG_LENGTH, MIN_VALUE)
 
 User = get_user_model()
 
@@ -25,12 +25,6 @@ class Tag(models.Model):
     slug = models.SlugField(
         'Слаг',
         max_length=MAX_TAG_NAME_SLUG_LENGTH,
-        validators=[
-            RegexValidator(
-                regex=REGEX_SLUG,
-                message='Недопустимый символ в slug тега.'
-            )
-        ],
         unique=True,
         blank=True,
         null=False
@@ -60,6 +54,12 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'measurement_unit'],
+                name='unique_ingredient'
+            )
+        ]
 
     def __str__(self):
         return self.name
@@ -86,7 +86,8 @@ class Recipe(models.Model):
         upload_to='media/recipes/images/',
     )
     cooking_time = models.PositiveIntegerField(
-        'Время приготовления (минуты)'
+        'Время приготовления (минуты)',
+        validators=[MinValueValidator(MIN_VALUE)]
     )
     ingredients = models.ManyToManyField(
         Ingredient, through='IngredientRecipe',
@@ -120,12 +121,19 @@ class IngredientRecipe(models.Model):
         verbose_name="Ингредиент"
     )
     amount = models.PositiveIntegerField(
-        'Количество'
+        'Количество',
+        validators=[MinValueValidator(MIN_VALUE)]
     )
 
     class Meta:
         verbose_name = "ингредиент в рецепте"
         verbose_name_plural = "Ингредиенты в рецептах"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='unique_recipe_ingredient'
+            )
+        ]
 
     def __str__(self):
         return f'{self.ingredient} для {self.recipe}'

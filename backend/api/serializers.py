@@ -8,7 +8,7 @@ from recipe.models import (Favorite, Follow, Ingredient, IngredientRecipe,
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from backend.constants import MAX_LENGTH_EMAIL, MAX_LENGTH_NAME, REGEX_USERNAME
+from .constants import MAX_LENGTH_EMAIL, MAX_LENGTH_NAME, REGEX_USERNAME
 
 User = get_user_model()
 
@@ -79,6 +79,49 @@ class CustomUserSerializer(CustomUserMixin, serializers.ModelSerializer):
         if not user.is_authenticated:
             return False
         return obj.followers.filter(user=user).exists()
+
+
+class RecipeListFollowSerializer2(serializers.Serializer):
+    recipes_limit = serializers.IntegerField(
+        required=False,
+        min_value=1,
+        max_value=100,
+        error_messages={
+            'min_value': 'Минимальное количество рецептов: 1.',
+            'max_value': 'Максимальное количество рецептов: 100.',
+        }
+    )
+
+
+class RecipeListFollowSerializer(serializers.Serializer):
+    recipes_limit = serializers.IntegerField(
+        required=False,
+        min_value=1,
+        max_value=100,
+        error_messages={
+            'min_value': 'Минимальное количество рецептов: 1.',
+            'max_value': 'Максимальное количество рецептов: 100.',
+        }
+    )
+
+    def validate(self, data):
+        user = self.context['request'].user
+        user_to_subscribe = self.context.get('user_to_subscribe')
+
+        if user_to_subscribe:
+            if user == user_to_subscribe:
+                raise serializers.ValidationError(
+                    {"detail": "Нельзя подписываться на самого себя"}
+                )
+
+            if Follow.objects.filter(
+                user=user, following=user_to_subscribe
+            ).exists():
+                raise serializers.ValidationError(
+                    {"detail": "Вы уже подписаны на этого пользователя"}
+                )
+
+        return data
 
 
 class CustomUserCreateSerializer(CustomUserMixin, UserCreateSerializer):
@@ -264,11 +307,18 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerializer):
             amount = ingredient['amount']
 
             ingredient = Ingredient.objects.get(id=ingredient_id)
-            IngredientRecipe.objects.update_or_create(
-                recipe=instance,
-                ingredient=ingredient,
-                amount=amount
-            )
+            existing_ingredient_recipe = IngredientRecipe.objects.filter(
+                recipe=instance, ingredient=ingredient
+            ).first()
+            if existing_ingredient_recipe:
+                existing_ingredient_recipe.amount = amount
+                existing_ingredient_recipe.save()
+            else:
+                IngredientRecipe.objects.create(
+                    recipe=instance,
+                    ingredient=ingredient,
+                    amount=amount
+                )
         instance.save()
         return instance
 

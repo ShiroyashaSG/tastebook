@@ -2,24 +2,25 @@ import csv
 from urllib.parse import urljoin
 
 from django.contrib.auth import get_user_model
-from django.db.models import Case, IntegerField, Q, Sum, Value, When
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from recipe.models import (Favorite, Follow, Ingredient, IngredientRecipe,
+from recipe.models import (Favorite, Follow, Ingredient,
                            Recipe, ShoppingCart, ShortLink, Tag)
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 
-from .filters import RecipeFilter
-from .paginations import CustomPagination
+from .services import get_shopping_cart_ingredients
+from .filters import RecipeFilter, IngredientFilter
+from .pagination import CustomPagination
 from .permissions import IsAnonymous, IsAuthor
 from .serializers import (IngredientSerializer, RecipeCreateUpdateSerializer,
                           RecipeSerializer, RecipeShortSerializer,
                           TagSerializer, UserAvatarSerializer,
-                          UserFollowSerializer)
+                          UserFollowSerializer,
+                          RecipeListFollowSerializer)
 
 User = get_user_model()
 
@@ -87,37 +88,30 @@ class CustomUserViewSet(UserViewSet):
         """Подписаться на пользователя/удалить подписку."""
         user = request.user
         user_to_subscribe = get_object_or_404(User, id=id)
-
         if request.method == 'POST':
-            recipes_limit = request.query_params.get('recipes_limit')
-            try:
-                recipes_limit = int(recipes_limit) if recipes_limit else 1
-            except ValueError:
-                return Response(
-                    {"detail": "Параметр 'recipes_limit' должен быть числом."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            if user == user_to_subscribe:
-                return Response(
-                    {"detail": "Нельзя подписываться на самого себя"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            elif Follow.objects.filter(
-                user=user, following=user_to_subscribe
-            ).exists():
-                return Response(
-                    {"detail": "Вы уже подписаны на этого пользователя"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            Follow.objects.create(user=user, following=user_to_subscribe)
-            serializer = UserFollowSerializer(
-                user_to_subscribe,
+            serializer = RecipeListFollowSerializer(
+                data=request.query_params,
                 context={
                     'request': request,
-                    'recipes_limit': recipes_limit
+                    'user_to_subscribe': user_to_subscribe
                 }
             )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if serializer.is_valid():
+                recipes_limit = serializer.validated_data.get('recipes_limit')
+                Follow.objects.create(user=user, following=user_to_subscribe)
+                serializer = UserFollowSerializer(
+                    user_to_subscribe,
+                    context={
+                        'request': request,
+                        'recipes_limit': recipes_limit
+                    }
+                )
+                return Response(
+                    serializer.data, status=status.HTTP_201_CREATED
+                )
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
         elif request.method == 'DELETE':
             subscription_exists = Follow.objects.filter(
                 user=user, following=user_to_subscribe
@@ -143,38 +137,39 @@ class CustomUserViewSet(UserViewSet):
     )
     def user_subscriptions(self, request):
         """Получение подписок пользователя."""
-        recipes_limit = request.query_params.get('recipes_limit', None)
-
-        try:
-            recipes_limit = int(recipes_limit) if recipes_limit else 1
-        except ValueError:
-            # Если не удалось преобразовать в целое число, можно вернуть ошибку
-            return Response(
-                {"detail": "Параметр 'recipes_limit' должен быть числом."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        # Получаем подписки текущего пользователя
-        subscriptions = Follow.objects.filter(
-            user=request.user
-        ).select_related('following')
-
-        # Извлекаем список подписанных пользователей
-        subscribed_users = User.objects.filter(
-            id__in=subscriptions.values_list('following_id', flat=True)
+        serializer = RecipeListFollowSerializer(
+            data=request.query_params,
+            context={
+                'request': request
+            }
         )
+        if serializer.is_valid():
+            recipes_limit = serializer.validated_data.get('recipes_limit')
+            # Получаем подписки текущего пользователя
+            subscriptions = Follow.objects.filter(
+                user=request.user
+            ).select_related('following')
 
-        # Применяем пагинацию
-        page = self.paginate_queryset(subscribed_users)
-        if page is not None:
-            serializer = UserFollowSerializer(
-                page,
-                many=True,
-                context={
-                    'request': request,
-                    'recipes_limit': recipes_limit,
-                }
+            # Извлекаем список подписанных пользователей
+            subscribed_users = User.objects.filter(
+                id__in=subscriptions.values_list('following_id', flat=True)
             )
-            return self.get_paginated_response(serializer.data)
+
+            # Применяем пагинацию
+            page = self.paginate_queryset(subscribed_users)
+            if page is not None:
+                serializer = UserFollowSerializer(
+                    page,
+                    many=True,
+                    context={
+                        'request': request,
+                        'recipes_limit': recipes_limit,
+                    }
+                )
+                return self.get_paginated_response(serializer.data)
+        return Response(
+            serializer.errors, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class IngredientViewSet(mixins.ListModelMixin,
@@ -184,28 +179,8 @@ class IngredientViewSet(mixins.ListModelMixin,
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (permissions.AllowAny, )
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        name_filter = self.request.query_params.get('name')
-
-        if name_filter:
-            queryset = queryset.filter(
-                Q(name__istartswith=name_filter) | Q(
-                    name__icontains=name_filter
-                )
-            )
-
-            queryset = queryset.order_by(
-                Case(
-                    When(name__istartswith=name_filter, then=Value(0)),
-                    default=Value(1),
-                    output_field=IntegerField(),
-                ),
-                'name'
-            )
-
-        return queryset
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = IngredientFilter
 
 
 class TagViewSet(mixins.ListModelMixin,
@@ -287,26 +262,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         full_url = urljoin(base_url, f"/s/{short_link.short_url}")
         return Response({'short-link': full_url})
 
-    def get_shopping_cart_ingredients(self):
-        """Генерация и скачивание списка покупок в формате CSV."""
-        shopping_cart = ShoppingCart.objects.filter(
-            user=self.request.user
-        ).prefetch_related('recipe')
-        ingredients = (
-            IngredientRecipe.objects.filter(
-                recipe__in=[item.recipe for item in shopping_cart]).values(
-                    'ingredient__name', 'ingredient__measurement_unit'
-            ).annotate(total_amount=Sum('amount'))
-        )
-        return [
-            {
-                "name": ingredient['ingredient__name'],
-                "measurement_unit": ingredient['ingredient__measurement_unit'],
-                "amount": ingredient['total_amount'],
-            }
-            for ingredient in ingredients
-        ]
-
     @action(
         methods=['get'],
         detail=False,
@@ -317,7 +272,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         """Генерация и скачивание списка покупок в формате CSV."""
-        items = self.get_shopping_cart_ingredients()
+        items = get_shopping_cart_ingredients(request)
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = (
             'attachment; filename="shopping_cart.csv"; charset=windows-1251'

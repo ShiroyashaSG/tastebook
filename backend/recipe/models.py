@@ -7,7 +7,10 @@ from django.db import models
 from django.db.models import CheckConstraint, F, Q
 
 from .constants import (MAX_LENGTH_INGREDIENT_NAME, MAX_LENGTH_INGREDIENT_UNIT,
-                        User, =, get_user_model)
+                        MAX_LENGTH_RECIPE_NAME, MAX_LENGTH_SHORT_URL,
+                        MAX_TAG_NAME_SLUG_LENGTH, MIN_VALUE)
+
+User = get_user_model()
 
 
 class Tag(models.Model):
@@ -92,10 +95,12 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag, related_name='recipes', verbose_name='Теги'
     )
+    created = models.DateTimeField('Дата создания', auto_now_add=True)
 
     class Meta:
         verbose_name = 'рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ('-created', )
 
     def __str__(self):
         return self.name

@@ -1,7 +1,12 @@
 from django.contrib import admin
 
 from .models import (Favorite, Follow, Ingredient, Recipe, ShoppingCart,
-                     ShortLink, Tag)
+                     ShortLink, Tag, IngredientRecipe)
+
+
+class RecipeIngredientInline(admin.StackedInline):
+    model = IngredientRecipe
+    extra = 0
 
 
 @admin.register(Recipe)
@@ -9,10 +14,18 @@ class RecipeAdmin(admin.ModelAdmin):
     """Настройки раздела рецетов админ зоны."""
 
     list_display = ('pk', 'name', 'author', 'favorites_count')
-    list_display_links = ('name',)
+    list_display_links = ('name', )
     search_fields = ('name', 'author__username')
-    list_filter = ('tags',)
-    fields = ('name', 'author', 'tags', 'favorites_count')
+    list_filter = ('tags', )
+    fields = (
+        'name',
+        'author',
+        'tags',
+        'text',
+        'image',
+        'cooking_time'
+    )
+    inlines = [RecipeIngredientInline]
     readonly_fields = ('favorites_count', )
 
     def favorites_count(self, obj):

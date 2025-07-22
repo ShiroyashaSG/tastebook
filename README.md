@@ -1,12 +1,9 @@
-# Фудграм
+# TasteBook
 
 
 ![Логотип проекта](frontend/src/images/logo-header.png)
 
-**Фудграм** — это веб-приложение для публикации и обмена рецептами. Пользователи могут публиковать свои рецепты, добавлять чужие рецепты в избранное и подписываться на публикации других авторов. Зарегистрированным пользователям также будет доступен сервис «Список покупок». Он позволит создавать список продуктов, которые нужно купить для приготовления выбранных блюд. 
-
-Проект развернут по адресу https://yourfoodgram.zapto.org. 
-Учетные данные от админки: логин - tim@gmail.com, пароль - yandex87.
+**TasteBook** — это веб-приложение для публикации и обмена рецептами. Пользователи могут публиковать свои рецепты, добавлять чужие рецепты в избранное и подписываться на публикации других авторов. Зарегистрированным пользователям также будет доступен сервис «Список покупок». Он позволит создавать список продуктов, которые нужно купить для приготовления выбранных блюд. 
 
 ![Главная страница проекта](readme_images/image_1711954469.png)
 
@@ -67,11 +64,11 @@
 
 1. Клонируйте репозиторий:
    ```bash
-   git clone https://github.com/ShiroyashaSG/foodgram.git
+   git clone https://github.com/ShiroyashaSG/tastebook.git
    ```
 2. Перейдите в директорию проекта:
    ```bash
-   cd foodgram
+   cd tastebook
    ```
 3. Cоздайте и активируйте виртуальное окружение:
    ```bash
@@ -126,7 +123,7 @@
     ```
 5. Создать директорию проекта и добавить .env:
     ```bash
-    mkdir foodgram && cd foodgram/
+    mkdir tastebook && cd tastebook/
     nano .env
     ```
     Пример .env:
@@ -143,7 +140,7 @@
     ```
 6. Скопировать в директорию проекта папки data, docs и docker-compose.yml файл:
     ```bash
-    scp -r data/* docs/* docker-compose.yml <server user>@<server IP>:/home/<server user>/foodgram/
+    scp -r data/* docs/* docker-compose.yml <server user>@<server IP>:/home/<server user>/tastebook/
     ```
 7. Выполнить сборку статики:
     ```bash
@@ -197,8 +194,8 @@ _Ответ:_
 ```json
 {
   "count": 123,
-  "next": "http://foodgram.example.org/api/recipes/?page=4",
-  "previous": "http://foodgram.example.org/api/recipes/?page=2",
+  "next": "http://tastebook.example.org/api/recipes/?page=4",
+  "previous": "http://tastebook.example.org/api/recipes/?page=2",
   "results": [
     {
       "id": 0,
@@ -216,7 +213,7 @@ _Ответ:_
         "first_name": "Вася",
         "last_name": "Иванов",
         "is_subscribed": false,
-        "avatar": "http://foodgram.example.org/media/users/image.png"
+        "avatar": "http://tastebook.example.org/media/users/image.png"
       },
       "ingredients": [
         {
@@ -229,7 +226,7 @@ _Ответ:_
       "is_favorited": true,
       "is_in_shopping_cart": true,
       "name": "string",
-      "image": "http://foodgram.example.org/media/recipes/images/image.png",
+      "image": "http://tastebook.example.org/media/recipes/images/image.png",
       "text": "string",
       "cooking_time": 1
     }
@@ -278,7 +275,7 @@ _Ответ:_
     "first_name": "Вася",
     "last_name": "Иванов",
     "is_subscribed": false,
-    "avatar": "http://foodgram.example.org/media/users/image.png"
+    "avatar": "http://tastebook.example.org/media/users/image.png"
   },
   "ingredients": [
     {
@@ -291,7 +288,7 @@ _Ответ:_
   "is_favorited": true,
   "is_in_shopping_cart": true,
   "name": "string",
-  "image": "http://foodgram.example.org/media/recipes/images/image.png",
+  "image": "http://tastebook.example.org/media/recipes/images/image.png",
   "text": "string",
   "cooking_time": 1
 }
@@ -318,7 +315,7 @@ _Ответ:_
     "first_name": "Вася",
     "last_name": "Иванов",
     "is_subscribed": false,
-    "avatar": "http://foodgram.example.org/media/users/image.png"
+    "avatar": "http://tastebook.example.org/media/users/image.png"
   },
   "ingredients": [
     {
@@ -331,7 +328,7 @@ _Ответ:_
   "is_favorited": true,
   "is_in_shopping_cart": true,
   "name": "string",
-  "image": "http://foodgram.example.org/media/recipes/images/image.png",
+  "image": "http://tastebook.example.org/media/recipes/images/image.png",
   "text": "string",
   "cooking_time": 1
 }
@@ -378,7 +375,7 @@ _Ответ:_
     "first_name": "Вася",
     "last_name": "Иванов",
     "is_subscribed": false,
-    "avatar": "http://foodgram.example.org/media/users/image.png"
+    "avatar": "http://tastebook.example.org/media/users/image.png"
   },
   "ingredients": [
     {
@@ -391,7 +388,7 @@ _Ответ:_
   "is_favorited": true,
   "is_in_shopping_cart": true,
   "name": "string",
-  "image": "http://foodgram.example.org/media/recipes/images/image.png",
+  "image": "http://tastebook.example.org/media/recipes/images/image.png",
   "text": "string",
   "cooking_time": 1
 }
@@ -403,7 +400,7 @@ _Ответ:_
 _Ответ:_
 ```json
 {
-"short-link": "https://foodgram.example.org/s/3d0"
+"short-link": "https://tastebook.example.org/s/3d0"
 }
 ```
 
@@ -423,12 +420,12 @@ _Ответ:_
     {
       "id": 0,
       "name": "string",
-      "image": "http://foodgram.example.org/media/recipes/images/image.png",
+      "image": "http://tastebook.example.org/media/recipes/images/image.png",
       "cooking_time": 1
     }
   ],
   "recipes_count": 0,
-  "avatar": "http://foodgram.example.org/media/users/image.png"
+  "avatar": "http://tastebook.example.org/media/users/image.png"
 }
 ```
 
